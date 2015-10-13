@@ -36,6 +36,7 @@ uint8_t key_defa_data[16] = { 0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,
 uint8_t key_picc_data[16] = { 0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4a,0x4b,0x4c,0x4d,0x4e,0x4f };
 
 static int CmdHelp(const char *Cmd);
+int CmdHF14ADesJS(uint8_t *aid, int i);
 
 int CmdHF14ADesWb(const char *Cmd)
 {
@@ -137,7 +138,8 @@ int CmdHF14ADesRb(const char *Cmd)
 int CmdHF14ADesInfo(const char *Cmd){
 
 	UsbCommand c = {CMD_MIFARE_DESFIRE_INFO};
-    SendCommand(&c);
+    PrintAndLog("Command %d",CMD_MIFARE_DESFIRE_INFO);
+	SendCommand(&c);
 	UsbCommand resp;
 	
 	if ( !WaitForResponseTimeout(CMD_ACK,&resp,1500) ) {
@@ -175,9 +177,14 @@ int CmdHF14ADesInfo(const char *Cmd){
 	
 	// Master Key settings
 	GetKeySettings(NULL);
+
+	// My Stuff
+	uint8_t aid[3] = {0x5f, 0x84, 0x04};
+	CmdHF14ADesJS(aid, 0);
 	
 	// Free memory on card
 	c.cmd = CMD_MIFARE_DESFIRE;
+	PrintAndLog("Command %d",CMD_MIFARE_DESFIRE);
 	c.arg[0] = (INIT | DISCONNECT);
 	c.arg[1] = 0x01;
 	c.d.asBytes[0] = GET_FREE_MEMORY;
@@ -637,6 +644,194 @@ int CmdHF14ADesAuth(const char *Cmd){
 }
 
 
+/*int CmdHF14ADesJS(const char *Cmd){
+	return 1;
+}*/
+
+int CmdHF14ADesJS(uint8_t *aid, int i){
+	
+	char messStr[512] = {0x00};
+	char *str = messStr;
+	uint8_t isOK = 0;
+	uint32_t options = NONE;
+	UsbCommand c;
+	UsbCommand resp;
+
+	//memset(messStr, 0x00, 512);
+	
+	c.cmd = CMD_MIFARE_DESFIRE;
+	
+	if ( aid == NULL ){
+		PrintAndLog(" CMK - PICC, Card Master Key settings ");
+		PrintAndLog("");
+		c.arg[CMDPOS] = (INIT | DISCONNECT);
+		c.arg[LENPOS] =  0x01;
+		c.d.asBytes[0] = GET_KEY_SETTINGS;  // 0x45
+		SendCommand(&c);
+		if ( !WaitForResponseTimeout(CMD_ACK,&resp,1000) ) {return 0;}  
+		isOK  = resp.arg[0] & 0xff;
+		if ( !isOK ){
+			PrintAndLog("   Can't select master application");	
+			return 0;
+		}	
+
+		str = (resp.d.asBytes[3] & (1 << 3 )) ? "YES":"NO";	
+		PrintAndLog("   [0x08] Configuration changeable       : %s", str);
+		str = (resp.d.asBytes[3] & (1 << 2 )) ? "NO":"YES";
+		PrintAndLog("   [0x04] CMK required for create/delete : %s",str);
+		str = (resp.d.asBytes[3] & (1 << 1 )) ? "NO":"YES";
+		PrintAndLog("   [0x02] Directory list access with CMK : %s",str);
+		str = (resp.d.asBytes[3] & (1 << 0 )) ? "YES" : "NO";
+		PrintAndLog("   [0x01] CMK is changeable              : %s", str);
+			
+		c.arg[LENPOS] = 0x02; //LEN
+		c.d.asBytes[0] = GET_KEY_VERSION; //0x64
+		c.d.asBytes[1] = 0x00;
+		SendCommand(&c);
+		if ( !WaitForResponseTimeout(CMD_ACK,&resp,1000) ) {
+			return 0;
+		}
+		isOK  = resp.arg[0] & 0xff;
+		if ( !isOK ){
+			PrintAndLog("   Can't read key-version");
+			return 0;
+		}
+		PrintAndLog("");
+		PrintAndLog("   Max number of keys       : %d", resp.d.asBytes[4]);
+		PrintAndLog("   Master key Version       : %d (0x%02x)", resp.d.asBytes[3], resp.d.asBytes[3]);
+		PrintAndLog("   ----------------------------------------------------------");
+		
+		c.arg[LENPOS] = 0x02; //LEN
+		c.d.asBytes[0] = AUTHENTICATE; //0x0A
+		c.d.asBytes[1] = 0x00; // KEY 0
+		SendCommand(&c);
+		if ( !WaitForResponseTimeout(CMD_ACK,&resp,1000) ) {return 0;}
+		isOK  = resp.d.asBytes[2] & 0xff;
+		PrintAndLog("   [0x0A] Authenticate      : %s", ( isOK==0xAE ) ? "NO":"YES");
+
+		c.d.asBytes[0] = AUTHENTICATE_ISO; //0x1A
+		SendCommand(&c);
+		if ( !WaitForResponseTimeout(CMD_ACK,&resp,1000) ) {return 0;}
+		isOK  = resp.d.asBytes[2] & 0xff;
+		PrintAndLog("   [0x1A] Authenticate ISO  : %s", ( isOK==0xAE ) ? "NO":"YES");
+		
+		c.d.asBytes[0] = AUTHENTICATE_AES; //0xAA
+		SendCommand(&c);
+		if ( !WaitForResponseTimeout(CMD_ACK,&resp,1000) ) {return 0;}
+		isOK  = resp.d.asBytes[2] & 0xff;
+		PrintAndLog("   [0xAA] Authenticate AES  : %s", ( isOK==0xAE ) ? "NO":"YES");
+		PrintAndLog("");
+		PrintAndLog("   ----------------------------------------------------------");
+		
+	} else {
+		PrintAndLog(" Starte Johannes' Mist");
+		
+		// SELECT AID
+		c.arg[0] = (INIT ); // I | CT
+		c.arg[LENPOS] = 0x04;
+		c.d.asBytes[0] = SELECT_APPLICATION;  // 0x5a
+		memcpy(c.d.asBytes+1, aid, 3);
+		SendCommand(&c);
+		
+		if (!WaitForResponseTimeout(CMD_ACK,&resp,1500) ) {
+			PrintAndLog("   Timed-out");
+			return 0;
+		} 
+		isOK  = resp.arg[0] & 0xff;
+		if ( !isOK ){
+			PrintAndLog("   Can't select AID: %s",sprint_hex(aid,3));	
+			return 0;
+		}	
+		switch (resp.d.asBytes[0]){
+		case OPERATION_OK: PrintAndLog("OPERATION_OK");break;
+		case ILLEGAL_COMMAND_CODE: PrintAndLog("ILLEGAL_COMMAND_CODE");break;
+		case PERMISSION_DENIED: PrintAndLog("PERMISSION_DENIED");break;
+		case APPLICATION_NOT_FOUND: PrintAndLog("APPLICATION_NOT_FOUND");break;
+		default: PrintAndLog("any other shit %d, %d, %d", isOK, resp.arg[0], resp.d.asBytes[0]);break;
+		}
+		
+		// KEY SETTINGS
+		options = NONE; //NONE
+		c.arg[0] = options;
+		c.arg[LENPOS] = 0x02;
+		c.d.asBytes[0] = AUTHENTICATE; // 0x45		
+		c.d.asBytes[1] = 0x00; // 0x45		
+		SendCommand(&c);
+		if ( !WaitForResponseTimeout(CMD_ACK,&resp,1500) ) {
+			return 0;
+		}
+		isOK  = resp.arg[0] & 0xff;
+		if ( !isOK ){
+			PrintAndLog("   Zeug: %d", isOK);
+		} else {
+			// Access rights.
+			/*uint8_t rights = (resp.d.asBytes[3] >> 4 && 0xff);
+			switch (rights){
+				case 0x00:
+					str = "AMK authentication is necessary to change any key (default)";
+					break;
+				case 0x0e:
+					str = "Authentication with the key to be changed (same KeyNo) is necessary to change a key";
+					break;
+				case 0x0f:
+					str = "All keys (except AMK,see Bit0) within this application are frozen";
+					break;
+				default:
+					str = "Authentication with the specified key is necessary to change any ley. A change key and a PICC master key (CMK) can only be changed after authentication with the master key. For keys other then the master or change key, an authentication with the same key is needed.";
+					break;
+			}
+			PrintAndLog("Changekey Access rights");
+			PrintAndLog("-- %s",str);
+			PrintAndLog("");	
+			// same as CMK
+			str = (resp.d.asBytes[3] & (1 << 3 )) ? "YES":"NO";	
+			PrintAndLog("   0x08 Configuration changeable       : %s", str);
+			str = (resp.d.asBytes[3] & (1 << 2 )) ? "NO":"YES";
+			PrintAndLog("   0x04 AMK required for create/delete : %s",str);
+			str = (resp.d.asBytes[3] & (1 << 1 )) ? "NO":"YES";
+			PrintAndLog("   0x02 Directory list access with AMK : %s",str);
+			str = (resp.d.asBytes[3] & (1 << 0 )) ? "YES" : "NO";
+			PrintAndLog("   0x01 AMK is changeable              : %s", str);*/
+		}
+		
+		// KEY VERSION  - AMK 
+		/*c.arg[0] = NONE;
+		c.arg[LENPOS] = 0x02;
+		c.d.asBytes[0] = GET_KEY_VERSION; //0x64
+		c.d.asBytes[1] = 0x00;
+		SendCommand(&c);
+		if ( !WaitForResponseTimeout(CMD_ACK,&resp,1500) ) {
+			PrintAndLog("   Timed-out");
+			return 0;
+		}
+		
+		int numOfKeys;
+		
+		isOK  = resp.arg[0] & 0xff;
+		if ( !isOK ){
+			PrintAndLog("   Can't read Application Master key version. Trying all keys");
+			numOfKeys = MAX_NUM_KEYS;
+		}
+		else{
+			numOfKeys = resp.d.asBytes[4];
+			PrintAndLog("");
+			PrintAndLog("     Max number of keys  : %d", numOfKeys );
+			PrintAndLog("     Application Master key Version  : %d (0x%02x)", resp.d.asBytes[3], resp.d.asBytes[3]);
+			PrintAndLog("-------------------------------------------------------------");			
+		}
+		
+		// LOOP over numOfKeys that we got before. 
+		// From 0x01 to numOfKeys.  We already got 0x00. (AMK)
+		for(int i=0x01; i<=0x0f; ++i){
+					
+		}*/
+		
+		
+	}
+	return 1;
+}
+
+
 static command_t CommandTable[] =
 {
   {"help",		CmdHelp,					1, "This help"},
@@ -645,6 +840,7 @@ static command_t CommandTable[] =
   {"auth",		CmdHF14ADesAuth,			0, "Tries a MIFARE DesFire Authentication"},
   {"rdbl",		CmdHF14ADesRb,				0, "Read MIFARE DesFire block"},
   {"wrbl",		CmdHF14ADesWb,				0, "write MIFARE DesFire block"},
+  //{"js",		CmdHF14ADesJS,				0, "own stuff...."},
   {NULL, NULL, 0, NULL}
 };
 

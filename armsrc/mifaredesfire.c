@@ -65,10 +65,12 @@ void MifareSendCommand(uint8_t arg0, uint8_t arg1, uint8_t *datain){
 	}
 	
 	if ( flags & CLEARTRACE ){
+		Dbprintf("< CLEARTRACE >");
 		clear_trace();
 	}
 	
 	if ( flags & INIT ){
+		Dbprintf("< INIT >");
 		if ( !InitDesfireCard() )
 			return;
 	}
@@ -87,6 +89,7 @@ void MifareSendCommand(uint8_t arg0, uint8_t arg1, uint8_t *datain){
 	pcb_blocknum = 0;
 	
 	if ( flags & DISCONNECT ){
+		Dbprintf("< DISCONNECT >");
 		OnSuccess();
 	}
 	

@@ -268,6 +268,9 @@ int CmdHF14AMfDump(const char *Cmd)
 	uint8_t rights[40][4];
 	uint8_t carddata[256][16];
 	uint8_t numSectors = 16;
+	char filename[FILE_PATH_SIZE];
+	memset(filename, 0, sizeof(filename));
+	int len, nameParamNo = 1;
 	
 	FILE *fin;
 	FILE *fout;
@@ -281,21 +284,31 @@ int CmdHF14AMfDump(const char *Cmd)
 		case '\0': numSectors = 16; break;
 		case '2' : numSectors = 32; break;
 		case '4' : numSectors = 40; break;
-		default:   numSectors = 16;
+		default:   	numSectors = 16;
+					nameParamNo = 0;
 	}	
 	
-	if (strlen(Cmd) > 1 || cmdp == 'h' || cmdp == 'H') {
-		PrintAndLog("Usage:   hf mf dump [card memory]");
+	if (cmdp == 'h' || cmdp == 'H') {
+		PrintAndLog("Usage:   hf mf dump [card memory] [filename w ending]");
 		PrintAndLog("  [card memory]: 0 = 320 bytes (Mifare Mini), 1 = 1K (default), 2 = 2K, 4 = 4K");
 		PrintAndLog("");
 		PrintAndLog("Samples: hf mf dump");
 		PrintAndLog("         hf mf dump 4");
+		PrintAndLog("         hf mf dump my_dumpkeys.bin");
 		return 0;
 	}
-	
-	if ((fin = fopen("dumpkeys.bin","rb")) == NULL) {
-		PrintAndLog("Could not find file dumpkeys.bin");
-		return 1;
+
+	len = param_getstr(Cmd,nameParamNo,filename);
+	if (len > 1){
+		if ((fin = fopen(filename,"rb")) == NULL) {
+			PrintAndLog("Could not find file dumpkeys.bin");
+			return 1;
+		}
+	}else{
+		if ((fin = fopen("dumpkeys.bin","rb")) == NULL) {
+			PrintAndLog("Could not find file dumpkeys.bin");
+			return 1;
+		}
 	}
 	
 	// Read keys A from file
