@@ -1,0 +1,48 @@
+xxd -c 16 RFID/Ergebnisse/basti/dumpdata.bin RFID/Ergebnisse/basti/data.hex
+awk '{print; if (FNR % 4 == 0 ) printf "\n";}' RFID/Ergebnisse/basti/data.hex >> RFID/Ergebnisse/basti/bdata.hex
+
+proxmark3> hf mf ekeyprn help
+|---|----------------|----------------|          
+|sec|key A           |key B           |          
+|---|----------------|----------------|          
+|000|  a0a1a2a3a4a5  |  9a1f7c1cb83b  |          
+|001|  9f314a909504  |  7e0424582440  |          
+|002|  fd9fb5ac1d97  |  77f91b57a9cf  |          
+|003|  0f5887840788  |  8d042057a000  |          
+|004|  ddcef4459bd4  |  9ecf92cf04cd  |          
+|005|  c26688c5632c  |  e79aa91c6be2  |          
+|006|  73bbc3dbf934  |  59bdbc8eff38  |          
+|007|  006dfd5e82cc  |  545572d51803  |          
+|008|  71185da7c5f6  |  3037d79bfde7  |          
+|009|  d9881c03b809  |  228c886a3887  |          
+|010|  1276ffc5266e  |  67bf76590cdb  |          
+|011|  56975d21820a  |  017340744119  |          
+|012|  a352c7cfa7db  |  7377f5f475ff  |          
+|013|  b500d2f357b1  |  10c922a290c9  |          
+|014|  05a2f9ff88b3  |  e9db3b7f5bd6  |          
+|015|  c30018043740  |  5006396cf990  |          
+|016|  07ee6ffe9d7a  |  ffa2b27debf1  |          
+|017|  9f325748b99c  |  9170d4e194ec  |          
+|018|  fedf9d9baf5f  |  ec57f72c6f45  |          
+|019|  b3ce4b5ea6af  |  263a0f502e18  |          
+|020|  bd0fe9b69f2a  |  63e707fd271b  |          
+|021|  048774f1e6c0  |  a1a9c882e536  |          
+|022|  b5dfffe73756  |  faf7787fff6d  |          
+|023|  389640233e21  |  071d1d372358  |          
+|024|  f45f0bbcce8e  |  bf60dfb5a37f  |          
+|025|  68e585037411  |  058988778404  |          
+|026|  6f6d65adeb2c  |  3b2f835068ab  |          
+|027|  f20a384d5e82  |  30c52d186000  |          
+|028|  73fd4569e5dd  |  3ed8f36b6cdd  |          
+|029|  521e8485751e  |  5298470703b0  |          
+|030|  89ba41efadb5  |  6cf0cb7f7ded  |          
+|031|  046484909484  |  498ccc523288  |          
+|032|  be321e431602  |  6f10410a4c93  |          
+|033|  ab143025ef18  |  d05a15eec160  |          
+|034|  4580d001d23f  |  0600d4461840  |          
+|035|  0680980580b2  |  1f2a079c580a  |          
+|036|  12e3c9016f62  |  532ca792021e  |          
+|037|  86faa06692c9  |  ea51a41721b0  |          
+|038|  03a8e2da900b  |  53abfe825a6e  |          
+|039|  5fbac1be8c20  |  10171e265892  |          
+|---|----------------|----------------| 

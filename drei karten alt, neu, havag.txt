@@ -1,0 +1,154 @@
+proxmark3> hf help
+help             This help          
+14a              { ISO14443A RFIDs... }          
+14b              { ISO14443B RFIDs... }          
+15               { ISO15693 RFIDs... }          
+epa              { German Identification Card... }          
+legic            { LEGIC RFIDs... }          
+iclass           { ICLASS RFIDs... }          
+mf               { MIFARE RFIDs... }          
+tune             Continuously measure HF antenna tuning          
+proxmark3> 
+proxmark3> hf mf help
+help             This help          
+dbg              Set default debug mode          
+rdbl             Read MIFARE classic block          
+urdbl            Read MIFARE Ultralight block          
+urdcard          Read MIFARE Ultralight Card          
+uwrbl            Write MIFARE Ultralight block          
+rdsc             Read MIFARE classic sector          
+dump             Dump MIFARE classic tag to binary file          
+restore          Restore MIFARE classic binary file to BLANK tag          
+wrbl             Write MIFARE classic block          
+chk              Test block keys          
+mifare           Read parity error messages.          
+nested           Test nested authentication          
+sniff            Sniff card-reader communication          
+sim              Simulate MIFARE card          
+eclr             Clear simulator memory block          
+eget             Get simulator memory block          
+eset             Set simulator memory block          
+eload            Load from file emul dump          
+esave            Save to file emul dump          
+ecfill           Fill simulator memory with help of keys from simulator          
+ekeyprn          Print keys from simulator memory          
+csetuid          Set UID for magic Chinese card          
+csetblk          Write block into magic Chinese card          
+cgetblk          Read block from magic Chinese card          
+cgetsc           Read sector from magic Chinese card          
+cload            Load dump into magic Chinese card          
+csave            Save dump from magic Chinese card into file or emulator          
+proxmark3> 
+proxmark3> hf 14a reader
+ATQA : 04 00          
+ UID : f5 68 26 87           
+ SAK : 88 [2]          
+TYPE : Infineon MIFARE CLASSIC 1K          
+proprietary non iso14443a-4 card found, RATS not supported          
+proxmark3> 
+proxmark3> hf 14b read
+proxmark3> 
+proxmark3> hf 15 read
+proxmark3> 
+proxmark3> hf 14a reader
+ATQA : 04 00          
+ UID : f5 68 26 87           
+ SAK : 88 [2]          
+TYPE : Infineon MIFARE CLASSIC 1K          
+proprietary non iso14443a-4 card found, RATS not supported          
+proxmark3> 
+proxmark3> hf 14a list 
+Recorded Activity          
+Start = Start of Start Bit, End = End of last modulation. Src = Source of Transfer          
+All times are in carrier periods (1/13.56Mhz)          
+     Start |       End | Src | Data          
+-----------|-----------|-----|--------          
+         0 |       992 | Rdr | 52              
+      2228 |      4596 | Tag | 04  00              
+      7040 |      9504 | Rdr | 93  20              
+     10676 |     16500 | Tag | f5  68  26  87  3c              
+     18560 |     29024 | Rdr | 93  70  f5  68  26  87  3c  9b  f3              
+     30260 |     33780 | Tag | 88  be  59              
+proxmark3> 
+proxmark3> hf 14a list 
+Recorded Activity          
+Start = Start of Start Bit, End = End of last modulation. Src = Source of Transfer          
+All times are in carrier periods (1/13.56Mhz)          
+     Start |       End | Src | Data          
+-----------|-----------|-----|--------          
+         0 |       992 | Rdr | 52              
+      2228 |      4596 | Tag | 04  00              
+      7040 |      9504 | Rdr | 93  20              
+     10676 |     16500 | Tag | f5  68  26  87  3c              
+     18560 |     29024 | Rdr | 93  70  f5  68  26  87  3c  9b  f3              
+     30260 |     33780 | Tag | 88  be  59              
+proxmark3> 
+proxmark3> hf 14a list 
+Recorded Activity          
+Start = Start of Start Bit, End = End of last modulation. Src = Source of Transfer          
+All times are in carrier periods (1/13.56Mhz)          
+     Start |       End | Src | Data          
+-----------|-----------|-----|--------          
+         0 |       992 | Rdr | 52              
+      2228 |      4596 | Tag | 04  00              
+      7040 |      9504 | Rdr | 93  20              
+     10676 |     16500 | Tag | f5  68  26  87  3c              
+     18560 |     29024 | Rdr | 93  70  f5  68  26  87  3c  9b  f3              
+     30260 |     33780 | Tag | 88  be  59              
+proxmark3> 
+proxmark3> hf 14a reader
+ATQA : 44 03          
+ UID : 04 5f 09 e9 bd 22 80           
+ SAK : 20 [1]          
+TYPE : NXP MIFARE DESFire 4k | DESFire EV1 2k/4k/8k | Plus 2k/4k SL3 | JCOP 31/41          
+ ATS : 06 75 77 81 02 80 02 f0           
+       -  TL : length is 6 bytes          
+       -  T0 : TA1 is present, TB1 is present, TC1 is present, FSCI is 5          
+       - TA1 : different divisors are supported, DR: [2, 4, 8], DS: [2, 4, 8]          
+       - TB1 : SFGI = 0, FWI = 8          
+       - TC1 : NAD is NOT supported, CID is supported          
+       -  HB : 80           
+proxmark3> 
+proxmark3> hf 14a reader
+ATQA : 44 03          
+ UID : 04 5f 09 e9 bd 22 80           
+ SAK : 20 [1]          
+TYPE : NXP MIFARE DESFire 4k | DESFire EV1 2k/4k/8k | Plus 2k/4k SL3 | JCOP 31/41          
+ ATS : 06 75 77 81 02 80 02 f0           
+       -  TL : length is 6 bytes          
+       -  T0 : TA1 is present, TB1 is present, TC1 is present, FSCI is 5          
+       - TA1 : different divisors are supported, DR: [2, 4, 8], DS: [2, 4, 8]          
+       - TB1 : SFGI = 0, FWI = 8          
+       - TC1 : NAD is NOT supported, CID is supported          
+       -  HB : 80           
+proxmark3> 
+proxmark3> hf 14a list 
+Recorded Activity          
+Start = Start of Start Bit, End = End of last modulation. Src = Source of Transfer          
+All times are in carrier periods (1/13.56Mhz)          
+     Start |       End | Src | Data          
+-----------|-----------|-----|--------          
+         0 |       992 | Rdr | 52              
+      2228 |      4596 | Tag | 44  03              
+      7040 |      9504 | Rdr | 93  20              
+     10676 |     16564 | Tag | 88  04  5f  09  da              
+     18560 |     29088 | Rdr | 93  70  88  04  5f  09  da  ee  1c              
+     30260 |     33780 | Tag | 24  d8  36              
+     35072 |     37536 | Rdr | 95  20              
+     38708 |     44532 | Tag | e9  bd  22  80  f6              
+     46592 |     57120 | Rdr | 95  70  e9  bd  22  80  f6  36  b9              
+     58292 |     61876 | Tag | 20  fc  70              
+     63232 |     68000 | Rdr | e0  80  31  73              
+     69172 |     78452 | Tag | 06  75  77  81  02  80  02  f0              
+proxmark3> 
+proxmark3> hf 14a reader
+ATQA : 48 00          
+ UID : 04 1e 34 1a fe 28 80           
+ SAK : 20 [1]          
+TYPE : NXP MIFARE DESFire 4k | DESFire EV1 2k/4k/8k | Plus 2k/4k SL3 | JCOP 31/41          
+ ATS : 0d 38 33 b1 4a 43 4f 50 33 31 56 32 32 8b 9c           
+       -  TL : length is 13 bytes          
+       -  T0 : TA1 is present, TB1 is present, TC1 is NOT present, FSCI is 8          
+       - TA1 : different divisors are supported, DR: [2, 4], DS: [2, 4]          
+       - TB1 : SFGI = 0, FWI = 8          
+       -  HB : 4a 43 4f 50 33 31 56 32 32     

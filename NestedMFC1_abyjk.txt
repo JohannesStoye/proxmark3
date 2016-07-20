@@ -1,0 +1,46 @@
+pcsc_scan
+
+Thu Nov 20 13:39:29 2014
+Reader 0: ACS ACR122U 00 00
+  Card state: Card inserted, 
+  ATR: 3B 8F 80 01 80 4F 0C A0 00 00 03 06 03 FF 88 00 00 00 00 1C
+
+ATR: 3B 8F 80 01 80 4F 0C A0 00 00 03 06 03 FF 88 00 00 00 00 1C
++ TS = 3B --> Direct Convention
++ T0 = 8F, Y(1): 1000, K: 15 (historical bytes)
+  TD(1) = 80 --> Y(i+1) = 1000, Protocol T = 0 
+-----
+  TD(2) = 01 --> Y(i+1) = 0000, Protocol T = 1 
+-----
++ Historical bytes: 80 4F 0C A0 00 00 03 06 03 FF 88 00 00 00 00
+  Category indicator byte: 80 (compact TLV data object)
+    Tag: 4, len: F (initial access data)
+      Initial access data: 0C A0 00 00 03 06 03 FF 88 00 00 00 00
++ TCK = 1C (correct checksum)
+
+Possibly identified card (using /usr/share/pcsc/smartcard_list.txt):
+3B 8F 80 01 80 4F 0C A0 00 00 03 06 03 FF 88 00 00 00 00 1C
+3B 8F 80 01 80 4F 0C A0 00 00 03 06 03 .. .. 00 00 00 00 ..
+	RFID - ISO 14443 Type A Part 3 (as per PCSC std part3)
+3B 8F 80 01 80 4F 0C A0 00 00 03 06 03 FF 88 00 00 00 00 1C
+	Infineon Mifare SLE 66R35
+	http://www.infineon.com/cms/en/product/channel.html?channel=ff80808112ab681d0112ab69686e01ee
+	"Old" "unlimited trips" card for Moscow Metro (underground)
+
+
+===================================================
+
+hf 14a read
+(zeigt kartendaten an)
+
+hf mf chk *1 ? t
+(probiert einen standard-key für jeden Sektor)
+(wenn einer gefunden wurde, dann mit diesem weiter)
+(hier bspw. Sektor 0-A-key)
+
+hf mf nested 1 0 A a0a1a2a3a4a5 d
+hf mf nested 1 0 B cb779c50e1bd d
+(probiert die nested-attacke und dump-t das ergebnis nach dumpkeys.bin)
+
+hf mf dump
+(gerade gefundene keys verwenden, um karte zu lesen -> dumpdata.bin)
